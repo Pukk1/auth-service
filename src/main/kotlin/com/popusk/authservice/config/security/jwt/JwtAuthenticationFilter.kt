@@ -1,4 +1,4 @@
-package com.popusk.authservice.config.security
+package com.popusk.authservice.config.security.jwt
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -25,11 +25,10 @@ class JwtAuthenticationFilter(
     ) {
         val reqTokenHeader = request.getHeader("Authorization")
         var userName: String? = null
-        val jwtToken: String? = null
         if (reqTokenHeader != null && reqTokenHeader.startsWith("Bearer ")) {
             val tokenWithoutBearer = reqTokenHeader.substring(7)
             try {
-                userName = jwtutil.extractUsername(tokenWithoutBearer)
+                userName = jwtUtil.extractUsername(tokenWithoutBearer)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

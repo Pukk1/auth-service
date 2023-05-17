@@ -1,11 +1,7 @@
-package com.popusk.authservice.controller.auth
+package com.popusk.authservice.api.v1.http.auth
 
-import org.springframework.beans.factory.annotation.Autowired
+import com.popusk.authservice.service.auth.AuthService
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -13,51 +9,17 @@ import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
-class AuthController {
-    @Autowired
-    private val userService: CustomUserService? = null
-
-    @Autowired
-    private val jwtUtil: JwtUtil? = null
-
-    @Autowired
-    private val authenticationManager: AuthenticationManager? = null
+class AuthController(
+    private val authService: AuthService,
+) {
     @RequestMapping(value = ["/login"], method = [RequestMethod.POST])
-    fun login(@RequestBody jwtRequest: JwtRequest): ResponseEntity<*> {
-        try {
-            authenticationManager!!.authenticate(
-                UsernamePasswordAuthenticationToken(
-                    jwtRequest.getUsername(),
-                    jwtRequest.getPassword()
-                )
-            )
-        } catch (e: Exception) {
-            throw Exception("Bad Credentials")
-        }
-
-        //fine code
-        val user: UserDetails = userService.loadUserByUsername(jwtRequest.getUsername())
-        val token: String = jwtUtil.generateToken(user)
-        println("Token = $token")
-        return ResponseEntity.ok<Any>(JwtResponse(token))
+    fun login(@RequestBody loginData: LoginRequestView): ResponseEntity<*> {
+        val response = authService.login(loginData)
+        return ResponseEntity.ok<Any>(response)
     }
 
     @RequestMapping(value = ["/register"], method = [RequestMethod.POST])
-    fun register(@RequestBody user: User?): ResponseEntity<*> {
-        return ResponseEntity.ok(userService.saveUser(user))
-    }
-
-    //Only ADMIN role can access this
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    @RequestMapping(value = ["/welcome"], method = [RequestMethod.GET])
-    fun test(): String {
-        return "Welcome with token !!"
-    }
-
-    //Only USER role can access this
-    @PreAuthorize("hasAnyRole('USER')")
-    @RequestMapping(value = ["/welcomeuser"], method = [RequestMethod.GET])
-    fun testuser(): String {
-        return "Welcome with token USER !!"
+    fun register(@RequestBody registerData: RegisterRequestView) {
+        val response = authService.register(registerData)
     }
 }

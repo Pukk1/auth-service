@@ -1,4 +1,15 @@
 package com.popusk.authservice.api.v1.http.auth
 
-class authView {
-}
+data class RegisterRequestView(
+    val username: String,
+    val password: String,
+)
+
+data class LoginRequestView(
+    val username: String,
+    val password: String,
+)
+
+data class LoginResponseView(
+    val jwt: String,
+)

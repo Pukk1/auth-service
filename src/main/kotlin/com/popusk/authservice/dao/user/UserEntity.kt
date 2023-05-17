@@ -1,11 +1,11 @@
-package com.popusk.authservice.config.security
+package com.popusk.authservice.dao.user
 
-import com.popusk.authservice.model.UserId
 import jakarta.persistence.*
-import org.springframework.security.core.GrantedAuthority
+
+typealias UserId = Long
 
 @Entity
-class UserDetails(
+class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: UserId,
@@ -13,33 +13,4 @@ class UserDetails(
     val username: String,
     val password: String,
     val isActive: Boolean,
-) {
-//    override fun getAuthorities(): List<GrantedAuthority> {
-//        return listOf()
-//    }
-//
-//    override fun getPassword(): String {
-//        return password
-//    }
-//
-//    override fun getUsername(): String {
-//        return username
-//    }
-//
-//    override fun isAccountNonExpired(): Boolean {
-//        return isActive
-//    }
-//
-//    override fun isAccountNonLocked(): Boolean {
-//        return isActive
-//    }
-//
-//    override fun isCredentialsNonExpired(): Boolean {
-//        return isActive
-//    }
-//
-//    override fun isEnabled(): Boolean {
-//        return isActive
-//    }
-
-}
+)

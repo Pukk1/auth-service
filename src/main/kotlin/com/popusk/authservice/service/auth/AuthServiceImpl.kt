@@ -5,6 +5,7 @@ import com.popusk.authservice.api.v1.http.auth.LoginResponseView
 import com.popusk.authservice.api.v1.http.auth.RegisterRequestView
 import com.popusk.authservice.config.security.jwt.JwtUtils
 import com.popusk.authservice.config.security.userdetails.CustomUserDetailsService
+import io.jsonwebtoken.Claims
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
@@ -43,5 +44,9 @@ class AuthServiceImpl(
                 true
             )
         )
+    }
+
+    override fun validateJWT(jwt: String): Claims {
+        return jwtUtils.validateToken(jwt)
     }
 }

@@ -1,45 +1,40 @@
 package com.popusk.authservice.config.security.jwt
 
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
-import org.slf4j.LoggerFactory
+import io.jsonwebtoken.*
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.security.KeyFactory
-import java.security.KeyPairGenerator
 import java.security.PrivateKey
+import java.security.PublicKey
 import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.X509EncodedKeySpec
 
 
 @Component
 class JwtUtils(
     @Value("\${private.key.filename}")
     privateKeyFileName: String,
-//    private val publicKeyFileName: String,
+    @Value("\${public.key.filename}")
+    publicKeyFileName: String,
 ) {
-//    final val ALGORITHM = "RSA"
     private val privateKey: PrivateKey
+    private val publicKey: PublicKey
 
     init {
-//        Base64.getDecoder().decode(privateKeyStr)
-//        var pkcs8Pem: String = privateKeyStr
-//        pkcs8Pem = pkcs8Pem.replace("-----BEGIN PRIVATE KEY-----", "")
-//        pkcs8Pem = pkcs8Pem.replace("-----END PRIVATE KEY-----", "")
-//        pkcs8Pem = pkcs8Pem.replace("\\s+".toRegex(), "")
-//        val pkcs8EncodedBytes: ByteArray = Base64.getDecoder().decode(pkcs8Pem)
-//        val keySpec = PKCS8EncodedKeySpec(pkcs8EncodedBytes)
-//        privateKey = KeyFactory.getInstance(ALGORITHM).generatePrivate(keySpec)
-
         val key = Files.readAllBytes(Paths.get(privateKeyFileName))
         val keyFactory = KeyFactory.getInstance("RSA")
         val keySpec = PKCS8EncodedKeySpec(key)
         privateKey = keyFactory.generatePrivate(keySpec)
     }
 
-//    private val logger = LoggerFactory.getLogger(this::class.java)
+    init {
+        val key = Files.readAllBytes(Paths.get(publicKeyFileName))
+        val keyFactory = KeyFactory.getInstance("RSA")
+        val keySpec = X509EncodedKeySpec(key)
+        publicKey = keyFactory.generatePublic(keySpec)
+    }
 
     fun generateToken(username: String): String {
         return generateToken(username, this.privateKey)
@@ -52,23 +47,22 @@ class JwtUtils(
     }
 
     fun extractUsername(authToken: String): String? {
-        return validateJwtToken(authToken)["username"] as String
+        return validateToken(authToken)["username"] as String
     }
 
-    fun validateJwtToken(authToken: String): Claims {
-        val claims = Jwts.parser().setSigningKey(this.privateKey).parseClaimsJws(authToken).body
-        return claims
+    fun validateToken(authToken: String): Claims {
+        try {
+            return Jwts.parser().setSigningKey(this.publicKey).parseClaimsJws(authToken).body
+        } catch (ex: SignatureException) {
+            throw java.lang.IllegalArgumentException("Invalid JWT signature")
+        } catch (ex: MalformedJwtException) {
+            throw java.lang.IllegalArgumentException("Invalid JWT token")
+        } catch (ex: ExpiredJwtException) {
+            throw java.lang.IllegalArgumentException("Expired JWT token")
+        } catch (ex: UnsupportedJwtException) {
+            throw java.lang.IllegalArgumentException("Unsupported JWT token")
+        } catch (ex: IllegalArgumentException) {
+            throw java.lang.IllegalArgumentException("JWT claims string is empty.")
+        }
     }
 }
-
-//private fun getRSAKeys(): Map<String, Any> {
-//    val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
-//    keyPairGenerator.initialize(2048)
-//    val keyPair = keyPairGenerator.generateKeyPair()
-//    val privateKey = keyPair.private
-//    val publicKey = keyPair.public
-//    val keys: MutableMap<String, Any> = HashMap()
-//    keys["private"] = privateKey
-//    keys["public"] = publicKey
-//    return keys
-//}

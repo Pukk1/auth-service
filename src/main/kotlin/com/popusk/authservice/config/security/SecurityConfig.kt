@@ -28,7 +28,7 @@ class SecurityConfig(
             .csrf().disable()
             .cors().disable()
             .authorizeHttpRequests()
-            .requestMatchers("/login", "/register").permitAll()
+            .requestMatchers("/api/v1/login", "/api/v1/register", "/api/v1/jwt/validate").permitAll()
             .anyRequest().authenticated()
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

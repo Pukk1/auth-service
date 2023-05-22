@@ -11,3 +11,6 @@ spring:
 private:
   key:
     filename: private_key.der
+public:
+  key:
+    filename: public_key.der

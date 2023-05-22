@@ -39,8 +39,7 @@ class JwtAuthenticationFilter(
                 usernamePasswordAuthenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
                 SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
             } else {
-                //any message
-                println("Token not validated!!")
+                println("Token not validated")
             }
         }
         filterChain.doFilter(request, response)

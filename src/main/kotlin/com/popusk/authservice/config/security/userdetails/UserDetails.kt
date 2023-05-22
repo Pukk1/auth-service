@@ -1,5 +1,7 @@
 package com.popusk.authservice.config.security.userdetails
 
+import com.popusk.authservice.dao.user.UserEntity
+import com.popusk.authservice.dao.user.UserId
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
@@ -36,4 +38,10 @@ class UserDetails(
         return isActive
     }
 
+    fun toEntity(id: UserId?) = UserEntity(
+        id,
+        username,
+        password,
+        isEnabled,
+    )
 }

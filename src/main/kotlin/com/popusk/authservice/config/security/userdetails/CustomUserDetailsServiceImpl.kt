@@ -1,6 +1,6 @@
 package com.popusk.authservice.config.security.userdetails
 
-import com.popusk.authservice.dao.user.UserEntity
+import com.popusk.authservice.dao.user.UserId
 import com.popusk.authservice.dao.user.UserRepo
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
@@ -16,7 +16,8 @@ class CustomUserDetailsServiceImpl(
         return UserDetails(entity.username, entity.password, entity.isActive)
     }
 
-    override fun saveUser(userEntity: UserEntity): UserEntity {
-        return userRepo.save(userEntity)
+    override fun saveUser(userDetails: UserDetails, id: UserId?): UserDetails {
+        val entity = userRepo.save(userDetails.toEntity(id))
+        return entity.toDetails()
     }
 }

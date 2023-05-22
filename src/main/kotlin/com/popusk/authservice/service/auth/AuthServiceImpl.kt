@@ -8,6 +8,7 @@ import com.popusk.authservice.config.security.userdetails.CustomUserDetailsServi
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
 @Service
@@ -15,6 +16,7 @@ class AuthServiceImpl(
     private val authenticationManager: AuthenticationManager,
     private val userDetailsService: CustomUserDetailsService,
     private val jwtUtils: JwtUtils,
+    private val encoder: BCryptPasswordEncoder,
 ) : AuthService {
     override fun login(loginRequestView: LoginRequestView): LoginResponseView {
         try {
@@ -34,6 +36,12 @@ class AuthServiceImpl(
     }
 
     override fun register(registerRequestView: RegisterRequestView) {
-
+        userDetailsService.saveUser(
+            com.popusk.authservice.config.security.userdetails.UserDetails(
+                registerRequestView.username,
+                encoder.encode(registerRequestView.password),
+                true
+            )
+        )
     }
 }

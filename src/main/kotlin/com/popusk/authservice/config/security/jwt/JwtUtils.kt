@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -15,11 +16,12 @@ import java.security.spec.PKCS8EncodedKeySpec
 
 @Component
 class JwtUtils(
-    private val privateKeyFileName: String,
-    private val publicKeyFileName: String,
+    @Value("\${private.key.filename}")
+    privateKeyFileName: String,
+//    private val publicKeyFileName: String,
 ) {
-    final val ALGORITHM = "RSA"
-    private lateinit var privateKey: PrivateKey
+//    final val ALGORITHM = "RSA"
+    private val privateKey: PrivateKey
 
     init {
 //        Base64.getDecoder().decode(privateKeyStr)
@@ -37,7 +39,7 @@ class JwtUtils(
         privateKey = keyFactory.generatePrivate(keySpec)
     }
 
-    private val logger = LoggerFactory.getLogger(this::class.java)
+//    private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun generateToken(username: String): String {
         return generateToken(username, this.privateKey)
@@ -57,16 +59,16 @@ class JwtUtils(
         val claims = Jwts.parser().setSigningKey(this.privateKey).parseClaimsJws(authToken).body
         return claims
     }
-
-    private fun getRSAKeys(): Map<String, Any> {
-        val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
-        keyPairGenerator.initialize(2048)
-        val keyPair = keyPairGenerator.generateKeyPair()
-        val privateKey = keyPair.private
-        val publicKey = keyPair.public
-        val keys: MutableMap<String, Any> = HashMap()
-        keys["private"] = privateKey
-        keys["public"] = publicKey
-        return keys
-    }
 }
+
+//private fun getRSAKeys(): Map<String, Any> {
+//    val keyPairGenerator = KeyPairGenerator.getInstance("RSA")
+//    keyPairGenerator.initialize(2048)
+//    val keyPair = keyPairGenerator.generateKeyPair()
+//    val privateKey = keyPair.private
+//    val publicKey = keyPair.public
+//    val keys: MutableMap<String, Any> = HashMap()
+//    keys["private"] = privateKey
+//    keys["public"] = publicKey
+//    return keys
+//}

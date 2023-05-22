@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 
 
@@ -22,7 +23,7 @@ class SecurityConfig(
 ) {
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity) {
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf().disable()
             .cors().disable()
@@ -32,13 +33,14 @@ class SecurityConfig(
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-        http
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+//        http
+//            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+        return http.build()
     }
 
-    protected fun configure(auth: AuthenticationManagerBuilder) {
-        auth.userDetailsService(customUserDetailsService)
-    }
+//    protected fun configure(auth: AuthenticationManagerBuilder) {
+//        auth.userDetailsService(customUserDetailsService)
+//    }
 
     @Bean
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager {
@@ -46,7 +48,7 @@ class SecurityConfig(
     }
 
     @Bean
-    fun bCryptPasswordEncoder(): BCryptPasswordEncoder? {
+    fun bCryptPasswordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
     }
 }

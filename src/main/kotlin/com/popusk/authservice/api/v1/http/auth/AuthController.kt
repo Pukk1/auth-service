@@ -21,7 +21,7 @@ class AuthController(
     }
 
     @PostMapping(value = ["/jwt/validate"])
-    fun validateJwt(@RequestParam jwt: String): Claims {
+    fun validateJwt(@RequestHeader("Authentication") jwt: String): Claims {
         return authService.validateJWT(jwt)
     }
 }

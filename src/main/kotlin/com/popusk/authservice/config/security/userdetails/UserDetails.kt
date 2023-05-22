@@ -38,10 +38,11 @@ class UserDetails(
         return isActive
     }
 
-    fun toEntity(id: UserId?) = UserEntity(
+    fun toEntity(id: UserId?, activeJwt: String) = UserEntity(
         id,
         username,
         password,
         isEnabled,
+        activeJwt,
     )
 }

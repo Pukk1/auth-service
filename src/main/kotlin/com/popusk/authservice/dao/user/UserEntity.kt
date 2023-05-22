@@ -9,11 +9,13 @@ typealias UserId = Long
 class UserEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: UserId?,
+    var id: UserId?,
     @Column(unique = true)
-    val username: String,
-    val password: String,
-    val isActive: Boolean,
+    var username: String,
+    var password: String,
+    var isActive: Boolean,
+    @Column(length = 3000)
+    var activeJwt: String,
 ) {
     fun toDetails() = UserDetails(username, password, isActive)
 }

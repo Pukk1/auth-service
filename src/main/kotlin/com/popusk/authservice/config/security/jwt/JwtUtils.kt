@@ -10,6 +10,7 @@ import java.security.PrivateKey
 import java.security.PublicKey
 import java.security.spec.PKCS8EncodedKeySpec
 import java.security.spec.X509EncodedKeySpec
+import java.util.*
 
 
 @Component
@@ -18,6 +19,9 @@ class JwtUtils(
     privateKeyFileName: String,
     @Value("\${public.key.filename}")
     publicKeyFileName: String,
+
+    @Value("\${jwt.expiration-time:1800000}") //по деволту полчаса
+    private val expirationTime: Long,
 ) {
     private val privateKey: PrivateKey
     private val publicKey: PublicKey
@@ -43,11 +47,9 @@ class JwtUtils(
     fun generateToken(username: String, privateKey: PrivateKey): String {
         val claims: MutableMap<String, Any?> = HashMap()
         claims["username"] = username
-        return Jwts.builder().setClaims(claims).signWith(SignatureAlgorithm.RS512, privateKey).compact()
-    }
-
-    fun extractUsername(authToken: String): String? {
-        return validateToken(authToken)["username"] as String
+        val expirationTime = Date(Date().time + this.expirationTime)
+        return Jwts.builder().setClaims(claims).setExpiration(expirationTime)
+            .signWith(SignatureAlgorithm.RS512, privateKey).compact()
     }
 
     fun validateToken(authToken: String): Claims {

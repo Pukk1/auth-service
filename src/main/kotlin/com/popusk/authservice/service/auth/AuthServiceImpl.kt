@@ -33,20 +33,29 @@ class AuthServiceImpl(
 
         val user: UserDetails = userDetailsService.loadUserByUsername(loginRequestView.username)
         val token: String = jwtUtils.generateToken(user.username)
+        userDetailsService.updateUserActiveJwtByUsername(user.username, token)
         return LoginResponseView(token)
     }
 
     override fun register(registerRequestView: RegisterRequestView) {
         userDetailsService.saveUser(
-            com.popusk.authservice.config.security.userdetails.UserDetails(
+            userDetails = com.popusk.authservice.config.security.userdetails.UserDetails(
                 registerRequestView.username,
                 encoder.encode(registerRequestView.password),
-                true
+                true,
             )
         )
     }
 
     override fun validateJWT(jwt: String): Claims {
-        return jwtUtils.validateToken(jwt)
+        val claims = jwtUtils.validateToken(jwt)
+
+        val activeJwt: String = userDetailsService.getUserActiveJwt(claims["username"] as String)
+
+        if (activeJwt != jwt) {
+            throw IllegalArgumentException("Jwt for user was changed")
+        }
+
+        return claims
     }
 }
